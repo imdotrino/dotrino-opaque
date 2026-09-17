@@ -82,6 +82,11 @@ npm test               # la API, los errores y el registro v1 fijado
 npm run test:vectors   # los vectores del RFC 9807 contra opaque-ke 4.0.1
 ```
 
+**La compilación es reproducible**: `npm run build` da en cualquier máquina la misma huella
+que CI (`build/wasm.sha256`; `a5a80de4…` para la 0.1.0), porque `scripts/build.mjs` reescribe
+las rutas absolutas y el compilador está fijado. Así se comprueba que lo publicado sale de
+este fuente.
+
 `test/fixtures/v1.json` es un registro guardado con la 0.1.0. **Toda compilación posterior
 tiene que abrirlo**: un registro que deja de abrir deja a alguien sin entrar.
 
