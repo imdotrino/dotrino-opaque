@@ -57,21 +57,15 @@ jobs:
             sbom-*.cdx.json
             build/wasm-bytes.js
 
-      # ARRANQUE DE UN PAQUETE NUEVO — SE QUITA EN CUANTO 0.1.0 ESTÉ EN NPM.
+      # Publicación de confianza: npm cambia la identidad OIDC de esta ejecución por un
+      # credencial efímero y firma la procedencia él solo. Se declara en npmjs.com, en los
+      # ajustes de @dotrino/opaque: repo `imdotrino/dotrino-opaque`, workflow `release.yml`.
+      # **El nombre de este archivo tiene que coincidir exacto.**
       #
-      # La publicación de confianza no puede hacer la PRIMERA publicación: se declara en los
-      # ajustes del paquete, y esos ajustes no existen hasta que el paquete existe
-      # (npm/cli#8544; pasó igual con @dotrino/verifier). La versión que crea el paquete
-      # necesita un token. Sigue publicando CI, con sus pruebas antes, y la procedencia va con
-      # `--provenance` a mano.
-      #
-      # EN CUANTO 0.1.0 ESTÉ PUBLICADA: declarar el publicador de confianza en npmjs.com (repo
-      # `imdotrino/dotrino-opaque`, workflow `release.yml`), borrar el secreto NPM_TOKEN del
-      # repo y dejar este paso en `npm publish --access public` a secas.
+      # La 0.1.0 salió con un token temporal (el paquete no existía y la confianza no se puede
+      # declarar antes, npm/cli#8544); el secreto se borró el 2026-09-17 en cuanto se publicó.
       - name: Publicar en npm
-        run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public
 
       - uses: softprops/action-gh-release@v2
         with:
