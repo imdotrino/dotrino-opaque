@@ -11,6 +11,7 @@
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { homedir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -28,7 +29,16 @@ if (cli !== pinned) {
   throw new Error(`build: wasm-bindgen CLI is ${cli} but the crate pins ${pinned} — cargo install wasm-bindgen-cli --version ${pinned} --locked`)
 }
 
-execFileSync('cargo', ['build', '--release', '--locked', '--target', 'wasm32-unknown-unknown'], { cwd: wasmDir, stdio: 'inherit' })
+// LA MISMA HUELLA EN CUALQUIER MÁQUINA. Sin esto, las rutas absolutas de cada una (el
+// registro de crates en el HOME, la carpeta del repo) se cuelan en los mensajes del binario, y
+// el WASM de CI no se puede comparar con el de nadie. Se reescriben a rutas fijas.
+const cargoHome = process.env.CARGO_HOME || join(homedir(), '.cargo')
+const rustflags = [`--remap-path-prefix=${cargoHome}=/cargo`, `--remap-path-prefix=${root}=/dotrino-opaque`].join(' ')
+execFileSync('cargo', ['build', '--release', '--locked', '--target', 'wasm32-unknown-unknown'], {
+  cwd: wasmDir,
+  stdio: 'inherit',
+  env: { ...process.env, RUSTFLAGS: rustflags },
+})
 const artifact = join(wasmDir, 'target', 'wasm32-unknown-unknown', 'release', 'dotrino_opaque.wasm')
 
 rmSync(out, { recursive: true, force: true })
