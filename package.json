@@ -1,0 +1,39 @@
+{
+  "name": "@dotrino/opaque",
+  "version": "0.1.0",
+  "description": "OPAQUE (RFC 9807) for the Dotrino ecosystem: check a password without the server ever seeing it. opaque-ke compiled to WASM in CI.",
+  "license": "MIT",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src",
+    "build/opaque.js",
+    "build/wasm-bytes.js",
+    "build/wasm.sha256",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test test/*.test.mjs",
+    "test:vectors": "bash scripts/vectors.sh"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imdotrino/dotrino-opaque.git"
+  },
+  "keywords": [
+    "dotrino",
+    "opaque",
+    "pake",
+    "rfc9807",
+    "password",
+    "wasm"
+  ]
+}

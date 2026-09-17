@@ -1,0 +1,35 @@
+# Compila el WASM desde el fuente y lo prueba en cada push y PR.
+#
+# Tres cosas, y las tres tienen que pasar:
+#   · npm test          — la API, los códigos de error y que el registro v1 siga abriendo
+#   · test:vectors      — los vectores del RFC 9807 contra la versión exacta de opaque-ke
+#   · la huella del WASM, impresa, para poder comparar compilaciones
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Rust (la versión la fija wasm/rust-toolchain.toml)
+        working-directory: wasm
+        run: rustup show active-toolchain
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/wasm-bindgen
+          key: wasm-bindgen-cli-0.2.100
+      - name: wasm-bindgen-cli (la misma versión que el crate)
+        run: command -v wasm-bindgen || cargo install wasm-bindgen-cli --version 0.2.100 --locked
+      - run: npm ci
+      - run: npm run build
+      - run: cat build/wasm.sha256
+      - run: npm test
+      - run: npm run test:vectors

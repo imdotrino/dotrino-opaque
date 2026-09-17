@@ -1,0 +1,30 @@
+[package]
+name = "dotrino-opaque"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+publish = false
+description = "OPAQUE (RFC 9807) for the Dotrino ecosystem: a thin WASM wrapper over opaque-ke"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# El protocolo entero es de opaque-ke (Meta, RFC 9807, auditado por NCC Group). Aquí no se
+# escribe criptografía: solo se fija la suite y se traduce a bytes que JS pueda mover.
+# Versiones EXACTAS: cambiar cualquiera de estas puede cambiar los bytes del registro, y un
+# registro que no se puede leer deja a alguien sin entrar.
+opaque-ke = { version = "=4.0.1", features = ["argon2"] }
+argon2 = { version = "=0.5.3", features = ["alloc"] }
+sha2 = "=0.10.9"
+rand = { version = "0.8", default-features = false, features = ["getrandom"] }
+getrandom = { version = "0.2", features = ["js"] }
+# Tiene que coincidir EXACTO con `wasm-bindgen-cli` (scripts/build.mjs lo comprueba).
+wasm-bindgen = "=0.2.100"
+js-sys = "0.3"
+base64 = "0.22"
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1

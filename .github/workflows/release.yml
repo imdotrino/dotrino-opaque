@@ -1,0 +1,81 @@
+# Publica @dotrino/opaque DESDE CI, no desde el portátil de nadie.
+#
+# El WASM se compila AQUÍ, desde el fuente de opaque-ke, y se publica ese mismo: nadie sube
+# un binario hecho en otra parte. Su huella va a la release y se atestigua.
+#
+# Y un SBOM por release, que el CRA da por supuesto y npm no aloja (CUMPLIMIENTO.md §2).
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write      # crear la release y subirle el SBOM y la huella
+  id-token: write      # OIDC: la procedencia y la atestación
+  attestations: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Node ≥22.14 y npm ≥11.5.1 para la publicación de confianza; Node 22 trae npm 10 y
+          # por eso se sube. Sin versión exacta: npm 12 exige ^22.22.2.
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - run: npm i -g npm@latest
+
+      - name: Rust (la versión la fija wasm/rust-toolchain.toml)
+        working-directory: wasm
+        run: rustup show active-toolchain
+      - name: wasm-bindgen-cli (la misma versión que el crate)
+        run: cargo install wasm-bindgen-cli --version 0.2.100 --locked
+
+      - run: npm ci
+      - run: npm run build
+
+      # LAS PRUEBAS ANTES DE PUBLICAR, las dos: la API y los vectores del RFC.
+      - run: npm test
+      - run: npm run test:vectors
+
+      - name: SBOM (CycloneDX)
+        run: |
+          npx --yes @cyclonedx/cyclonedx-npm@latest \
+            --omit dev --output-format JSON \
+            --output-file "sbom-$(node -p "require('./package.json').version").cdx.json"
+
+      - name: Atestiguar el SBOM y el WASM publicado
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: |
+            sbom-*.cdx.json
+            build/wasm-bytes.js
+
+      # ARRANQUE DE UN PAQUETE NUEVO — SE QUITA EN CUANTO 0.1.0 ESTÉ EN NPM.
+      #
+      # La publicación de confianza no puede hacer la PRIMERA publicación: se declara en los
+      # ajustes del paquete, y esos ajustes no existen hasta que el paquete existe
+      # (npm/cli#8544; pasó igual con @dotrino/verifier). La versión que crea el paquete
+      # necesita un token. Sigue publicando CI, con sus pruebas antes, y la procedencia va con
+      # `--provenance` a mano.
+      #
+      # EN CUANTO 0.1.0 ESTÉ PUBLICADA: declarar el publicador de confianza en npmjs.com (repo
+      # `imdotrino/dotrino-opaque`, workflow `release.yml`), borrar el secreto NPM_TOKEN del
+      # repo y dejar este paso en `npm publish --access public` a secas.
+      - name: Publicar en npm
+        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            sbom-*.cdx.json
+            build/wasm.sha256
+          generate_release_notes: true

@@ -1,0 +1,5 @@
+[toolchain]
+# Fijado para que el WASM de CI y el de cualquier máquina salgan del mismo compilador.
+channel = "1.96.0"
+targets = ["wasm32-unknown-unknown"]
+profile = "minimal"

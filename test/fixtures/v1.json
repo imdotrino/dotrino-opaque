@@ -1,0 +1,14 @@
+{
+  "note": "Generated once with @dotrino/opaque 0.1.0. Must keep opening with every later build: a record that stops opening locks someone out.",
+  "suite": "opaque-rfc9807/ristretto255-sha512-3dh/argon2id-m65536-t3-p4",
+  "password": "fixture password v1",
+  "identifiers": {
+    "client": "ana",
+    "server": "AB12-CD34-EF56"
+  },
+  "credentialId": "ana",
+  "setup": "Kh6zMRoJhlGUFUg3Tv1QjJ11JUNZcQjd0gs-W4Jy3yfcLMvMv8pBuIeQqnWkClhr5DC2LXPrMCOTNk123OQn6HJ3V_SPhidKQouTlvKD_8mu7YA0gCEnBTdsa3-MIVEM3tESsjRM5ve626eiKFtW6q5GI-zR_3wwqjbt0CtCZHA",
+  "record": "fCi62Ci9p_471EgcCQ1bxotkQwC-vXwJ2Hf5-G_8VjuyNZT-EsAR55WTMBFWN9qY_Hsn2awxrCTjnQk5rFh-oWOOnfd_3ccNt8CZFAZ45NJwMqYlPzoSiE-a6EIXkpuiC3MimREJkZcnOfNzpErviufvqAdkfLBJWkpInU733UKeVHdPTpr2iPHbP4Ifc_yzkFAltug-iAFKWKS_JjU-I_hGjYzBWVRMYcaXlyfjNNs-cV8DrQjaT4lxq0KxIpN0",
+  "exportKey": "hdylWUr3DFifczaKFJV8Fcpkh2rnc7ehxlygBZhOc607t8YuZHI1_Yw_hQ27yltULiAU-MbNLYn3EMUStS-New",
+  "serverPublicKey": "CsQJSrSmybWcH53JIHihxa1eVDKEsf7vwTT02v22Jy8"
+}
