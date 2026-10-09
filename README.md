@@ -92,3 +92,7 @@ tiene que abrirlo**: un registro que deja de abrir deja a alguien sin entrar.
 
 Se publica **desde CI** con un tag `vX.Y.Z` (`.github/workflows/release.yml`), con el SBOM, la
 procedencia y la huella del WASM en la release. Nunca `npm publish` a mano.
+
+## Documentación de uso
+
+Está en el wiki: <https://wiki.dotrino.com/desarrollo/pilares/>
